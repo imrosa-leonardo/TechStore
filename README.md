@@ -127,6 +127,71 @@ Rode a API:
 dotnet run
 ```
 
+## Modelo de dados
+
+O sistema é composto por cinco entidades principais: **Categoria**, **Produto**, **Fornecedor**, **DetalheProduto** e **Usuario**.
+
+### Categoria
+
+Representa a classificação de um produto (ex: Jogos, Monitores). Cada categoria pode estar associada a vários produtos, mas não pode ser excluída enquanto houver produtos vinculados a ela.
+
+- `Id` (chave primária)
+- `Nome`
+- `Descricao`
+
+**Relacionamento**: um-para-muitos com Produto (`Categoria 1 — N Produto`), obrigatório.
+
+### Fornecedor
+
+Representa o parceiro ou distribuidor responsável por fornecer um produto. Um fornecedor pode estar vinculado a vários produtos, mas não pode ser excluído enquanto houver produtos associados.
+
+- `Id` (chave primária)
+- `Nome`
+- `Contato`
+
+**Relacionamento**: um-para-muitos com Produto (`Fornecedor 1 — N Produto`), opcional — um produto pode não ter fornecedor definido.
+
+### Produto
+
+Entidade central do sistema. Cada produto pertence a uma categoria, pode ter um fornecedor e possui um detalhe complementar.
+
+- `Id` (chave primária)
+- `Nome`
+- `Descricao`
+- `Preco`
+- `Quantidade`
+- `DataCriacao`
+- `CategoriaId` (chave estrangeira, obrigatória)
+- `FornecedorId` (chave estrangeira, opcional)
+
+**Relacionamentos**:
+- Muitos-para-um com Categoria (obrigatório)
+- Muitos-para-um com Fornecedor (opcional)
+- Um-para-um com DetalheProduto
+
+### DetalheProduto
+
+Armazena informações complementares de um produto específico. Cada produto possui no máximo um detalhe, e a exclusão do produto remove automaticamente seu detalhe associado.
+
+- `Id` (chave primária)
+- `ProdutoId` (chave estrangeira, única)
+
+**Relacionamento**: um-para-um com Produto, com exclusão em cascata.
+
+### Usuario
+
+Entidade isolada, sem relacionamento com as demais, utilizada exclusivamente para autenticação no sistema.
+
+- `Id` (chave primária)
+- `NomeUsuario`
+- `SenhaHash` (senha armazenada com hash via BCrypt)
+
+### Regras de integridade
+
+- Um produto **não pode existir sem categoria**, mas pode existir sem fornecedor
+- Excluir uma **categoria** ou **fornecedor** com produtos vinculados é bloqueado pelo banco (`DeleteBehavior.Restrict`)
+- Excluir um **produto** remove automaticamente seu `DetalheProduto` correspondente (`DeleteBehavior.Cascade`)
+
 A API sobe por padrão em `https://localhost:5243` (ajuste conforme seu `launchSettings.json`).
 
 ### Criando o primeiro usuário

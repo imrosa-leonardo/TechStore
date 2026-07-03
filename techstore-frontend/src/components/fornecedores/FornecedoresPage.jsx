@@ -1,114 +1,160 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { Plus, RefreshCw, Truck } from 'lucide-react';
 import { fornecedorService } from '../../services/fornecedorService';
+import { useToast } from '../../hooks/useToast';
+import FornecedoresTable from './FornecedoresTable';
 import FornecedorFormModal from './FornecedorFormModal';
-import { Pencil, Trash2 } from 'lucide-react'; // Ícones usados no seu projeto
+import ConfirmDialog from '../ui/ConfirmDialog';
 
-export default function FornecedoresPage() {
-  const [fornecedores, setFornecedores] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [fornecedorSelecionado, setFornecedorSelecionado] = useState(null);
+function FornecedoresPage() {
+    const [fornecedores, setFornecedores] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(true);
 
-  const carregarFornecedores = async () => {
-    try {
-      const dados = await fornecedorService.listar();
-      setFornecedores(dados);
-    } catch (error) {
-      console.error("Erro ao buscar fornecedores", error);
-    }
-  };
+    const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [fornecedorEditando, setFornecedorEditando] = useState(null);
+    const [fornecedorDeletando, setFornecedorDeletando] = useState(null);
 
-  useEffect(() => {
-    carregarFornecedores();
-  }, []);
+    const toast = useToast();
 
-  const handleAbrirCadastro = () => {
-    setFornecedorSelecionado(null);
-    setIsModalOpen(true);
-  };
-
-  const handleAbrirEdicao = (fornecedor) => {
-    setFornecedorSelecionado(fornecedor);
-    setIsModalOpen(true);
-  };
-
-  const handleDeletar = async (id, nome) => {
-    if (window.confirm(`Tem certeza que deseja remover o fornecedor "${nome}"?`)) {
-      try {
-        await fornecedorService.deletar(id);
+    useEffect(() => {
         carregarFornecedores();
-      } catch (error) {
-        alert(error.response?.data || "Erro ao deletar fornecedor. Verifique se ele possui produtos vinculados.");
-      }
-    }
-  };
+    }, []);
 
-  return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Gerenciamento de Fornecedores</h1>
-          <p className="text-gray-500">Gerencie os parceiros e distribuidores da sua loja.</p>
-        </div>
-        <button
-          onClick={handleAbrirCadastro}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors text-sm flex items-center gap-2 shadow-sm"
-        >
-          <span>+</span> Novo Fornecedor
-        </button>
-      </div>
+    const carregarFornecedores = async () => {
+        try {
+            setLoading(true);
+            const dados = await fornecedorService.listar();
+            setFornecedores(dados);
+        } catch (error) {
+            toast.error('Não foi possível carregar os fornecedores. Verifique se a API está rodando.');
+            console.error('Erro ao carregar fornecedores:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-100 text-gray-600 text-sm font-medium">
-              <th className="p-4">ID</th>
-              <th className="p-4">Nome</th>
-              <th className="p-4">Contato</th>
-              <th className="p-4 text-center">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-700 text-sm">
-            {fornecedores.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="p-8 text-center text-gray-400">
-                  Nenhum fornecedor cadastrado ainda.
-                </td>
-              </tr>
+    const handleNovo = () => {
+        setFornecedorEditando(null);
+        setIsFormModalOpen(true);
+    };
+
+    const handleEditar = (fornecedor) => {
+        setFornecedorEditando(fornecedor);
+        setIsFormModalOpen(true);
+    };
+
+    const handleSucessoFormulario = async () => {
+        setIsFormModalOpen(false);
+        setFornecedorEditando(null);
+        toast.success(
+            fornecedorEditando
+                ? `Fornecedor "${fornecedorEditando.nome}" atualizado com sucesso!`
+                : 'Fornecedor cadastrado com sucesso!'
+        );
+        await carregarFornecedores();
+    };
+
+    const handleConfirmarDeletar = (fornecedor) => {
+        setFornecedorDeletando(fornecedor);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const handleDeletar = async () => {
+        try {
+            await fornecedorService.deletar(fornecedorDeletando.id);
+            toast.success(`Fornecedor "${fornecedorDeletando.nome}" removido com sucesso!`);
+            setIsDeleteDialogOpen(false);
+            setFornecedorDeletando(null);
+            await carregarFornecedores();
+        } catch (error) {
+            const mensagemErro = error.response?.data || 'Erro ao remover fornecedor. Verifique se ele possui produtos vinculados.';
+            toast.error(mensagemErro);
+            setIsDeleteDialogOpen(false);
+            console.error('Erro ao deletar fornecedor:', error);
+        }
+    };
+
+    return (
+        <div className="p-6">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/40 rounded-lg flex items-center justify-center">
+                        <Truck className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                    </div>
+                    <div>
+                        <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">Fornecedores</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {fornecedores.length}{' '}
+                            {fornecedores.length === 1 ? 'fornecedor cadastrado' : 'fornecedores cadastrados'}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={carregarFornecedores}
+                        title="Recarregar lista"
+                        className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                    </button>
+                    <button
+                        onClick={handleNovo}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 rounded-lg transition-colors shadow-sm"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Novo Fornecedor
+                    </button>
+                </div>
+            </div>
+
+            {/* Loading ou tabela */}
+            {loading ? (
+                <div className="flex items-center justify-center py-20">
+                    <RefreshCw className="w-6 h-6 text-orange-500 animate-spin" />
+                    <span className="ml-3 text-gray-500 dark:text-gray-400">Carregando fornecedores...</span>
+                </div>
             ) : (
-              fornecedores.map((f) => (
-                <tr key={f.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                  <td className="p-4 font-mono text-gray-400">#{f.id}</td>
-                  <td className="p-4 font-medium text-gray-900">{f.nome}</td>
-                  <td className="p-4 text-gray-500">{f.contato}</td>
-                  <td className="p-4 flex justify-center gap-3">
-                    <button
-                      onClick={() => handleAbrirEdicao(f)}
-                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                      title="Editar"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeletar(f.id, f.nome)}
-                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                      title="Deletar"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))
+                <FornecedoresTable
+                    fornecedores={fornecedores}
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    onEditar={handleEditar}
+                    onDeletar={handleConfirmarDeletar}
+                />
             )}
-          </tbody>
-        </table>
-      </div>
 
-      <FornecedorFormModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={carregarFornecedores}
-        fornecedor={fornecedorSelecionado}
-      />
-    </div>
-  );
+            {/* Modal de formulário (criar/editar) */}
+            <FornecedorFormModal
+                isOpen={isFormModalOpen}
+                onClose={() => {
+                    setIsFormModalOpen(false);
+                    setFornecedorEditando(null);
+                }}
+                onSuccess={handleSucessoFormulario}
+                fornecedor={fornecedorEditando}
+            />
+
+            {/* Diálogo de confirmação de exclusão */}
+            <ConfirmDialog
+                isOpen={isDeleteDialogOpen}
+                onClose={() => {
+                    setIsDeleteDialogOpen(false);
+                    setFornecedorDeletando(null);
+                }}
+                onConfirm={handleDeletar}
+                title="Deletar Fornecedor"
+                message={
+                    fornecedorDeletando
+                        ? `Tem certeza que deseja excluir o fornecedor "${fornecedorDeletando.nome}"? Fornecedores com produtos associados não podem ser deletados.`
+                        : ''
+                }
+            />
+        </div>
+    );
 }
+
+export default FornecedoresPage;

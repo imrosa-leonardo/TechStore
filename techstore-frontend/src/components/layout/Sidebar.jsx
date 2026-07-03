@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Truck, ShoppingCart, Tag, Monitor, LogOut } from 'lucide-react'; // 1. Adicionado o ícone LogOut
-import { useAuth } from '../../contexts/AuthContext'; // 2. Importado o seu contexto de autenticação
+import { Truck, ShoppingCart, Tag, Monitor, LogOut, Sun, Moon } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const menuItems = [
   { to: '/produtos', label: 'Produtos', icon: ShoppingCart, enabled: true },
@@ -9,12 +10,13 @@ const menuItems = [
 ];
 
 function Sidebar() {
-  const { logout } = useAuth(); // 3. Puxando a função de logout do contexto
+  const { logout } = useAuth();
+  const { tema, alternarTema } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout(); // Limpa o estado global e o localStorage
-    navigate('/login'); // Redireciona o usuário para a tela de login
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -68,8 +70,16 @@ function Sidebar() {
         </ul>
       </nav>
 
-      {/* Rodapé modificado para incluir o Botão de Sair */}
+      {/* Rodapé com alternância de tema e botão de sair */}
       <div className="p-3 border-t border-gray-700 flex flex-col gap-2">
+        <button
+          onClick={alternarTema}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+        >
+          {tema === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          {tema === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+        </button>
+
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-950/40 hover:text-red-300 transition-colors"

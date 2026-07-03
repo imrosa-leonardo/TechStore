@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { register } from "../../services/authService"; // Importando o serviço
-import { User, Lock, Eye, EyeOff, Monitor } from "lucide-react";
+import { register } from "../../services/authService";
+import { useTheme } from "../../contexts/ThemeContext";
+import { User, Lock, Eye, EyeOff, Monitor, Sun, Moon } from "lucide-react";
 
 export default function RegisterPage() {
   const [nomeUsuario, setNomeUsuario] = useState("");
@@ -9,6 +10,7 @@ export default function RegisterPage() {
   const [sucesso, setSucesso] = useState("");
   const [erro, setErro] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { tema, alternarTema } = useTheme();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -27,8 +29,17 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="w-[450px] bg-white rounded-3xl shadow-xl overflow-hidden">
+    <div className="relative flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-950">
+      {/* Botão de alternância de tema */}
+      <button
+        onClick={alternarTema}
+        title={tema === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+        className="absolute top-6 right-6 p-2.5 rounded-lg text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm"
+      >
+        {tema === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+      </button>
+
+      <div className="w-[450px] bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden">
         {/* Cabeçalho Navy */}
         <div className="bg-gray-950 p-10 text-center flex flex-col items-center gap-4">
           <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center">
@@ -41,14 +52,14 @@ export default function RegisterPage() {
         {/* Formulário Principal */}
         <div className="p-10 space-y-8">
           <div className="space-y-2 text-center">
-            <h2 className="text-3xl font-bold text-gray-900">Crie sua conta</h2>
-            <p className="text-gray-600">Cadastre um novo usuário administrador.</p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Crie sua conta</h2>
+            <p className="text-gray-600 dark:text-gray-400">Cadastre um novo usuário administrador.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Campo Usuário */}
             <div className="space-y-2">
-              <label className="text-gray-700 font-medium block">Nome do Usuário</label>
+              <label className="text-gray-700 dark:text-gray-300 font-medium block">Nome do Usuário</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-gray-400" />
@@ -58,7 +69,7 @@ export default function RegisterPage() {
                   placeholder="Ex: joao_admin"
                   value={nomeUsuario}
                   onChange={(e) => setNomeUsuario(e.target.value)}
-                  className="w-full border border-gray-200 p-4 pl-12 rounded-lg text-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all"
+                  className="w-full border border-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 p-4 pl-12 rounded-lg text-lg focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 focus:border-blue-300 transition-all"
                   required
                 />
               </div>
@@ -66,7 +77,7 @@ export default function RegisterPage() {
 
             {/* Campo Senha */}
             <div className="space-y-2">
-              <label className="text-gray-700 font-medium block">Senha de Acesso</label>
+              <label className="text-gray-700 dark:text-gray-300 font-medium block">Senha de Acesso</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-gray-400" />
@@ -76,21 +87,21 @@ export default function RegisterPage() {
                   placeholder="Crie uma senha estável"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  className="w-full border border-gray-200 p-4 pl-12 pr-12 rounded-lg text-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all"
+                  className="w-full border border-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 p-4 pl-12 pr-12 rounded-lg text-lg focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 focus:border-blue-300 transition-all"
                   required
                 />
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
               </div>
-              {erro && <p className="text-red-500 text-sm mt-1">{erro}</p>}
-              {sucesso && <p className="text-green-600 text-sm mt-1">{sucesso}</p>}
+              {erro && <p className="text-red-500 dark:text-red-400 text-sm mt-1">{erro}</p>}
+              {sucesso && <p className="text-green-600 dark:text-green-400 text-sm mt-1">{sucesso}</p>}
             </div>
 
             {/* Botão de Enviar */}
@@ -105,9 +116,9 @@ export default function RegisterPage() {
           </form>
 
           {/* Links do Rodapé */}
-          <div className="pt-6 border-t border-gray-100 text-center">
-            <p className="text-gray-600">
-              Já tem uma conta? <Link to="/login" className="text-blue-600 font-medium hover:underline">Faça Login</Link>
+          <div className="pt-6 border-t border-gray-100 dark:border-gray-700 text-center">
+            <p className="text-gray-600 dark:text-gray-400">
+              Já tem uma conta? <Link to="/login" className="text-blue-600 dark:text-blue-400 font-medium hover:underline">Faça Login</Link>
             </p>
           </div>
         </div>

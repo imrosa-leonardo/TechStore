@@ -96,12 +96,12 @@ function CategoriasPage() {
         <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
             {/* Ícone da página */}
-            <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                <Tag className="w-5 h-5 text-emerald-600" />
+            <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg flex items-center justify-center">
+                <Tag className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-                <h1 className="text-xl font-bold text-gray-800">Categorias</h1>
-                <p className="text-sm text-gray-500">
+                <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">Categorias</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                 {/* Texto dinâmico: "1 categoria cadastrada" ou "3 categorias cadastradas" */}
                 {categorias.length}{' '}
                 {categorias.length === 1 ? 'categoria cadastrada' : 'categorias cadastradas'}
@@ -114,7 +114,7 @@ function CategoriasPage() {
             <button
                 onClick={carregarDados}
                 title="Recarregar lista"
-                className="p-2.5 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+                className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
@@ -133,7 +133,7 @@ function CategoriasPage() {
         {loading ? (
             <div className="flex items-center justify-center py-20">
             <RefreshCw className="w-6 h-6 text-emerald-500 animate-spin" />
-            <span className="ml-3 text-gray-500">Carregando categorias...</span>
+            <span className="ml-3 text-gray-500 dark:text-gray-400">Carregando categorias...</span>
             </div>
         ) : (
             <CategoriasTable

@@ -101,19 +101,19 @@ function ProdutosPage() {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <ShoppingCart className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center">
+                        <ShoppingCart className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                        <h1 className="text-x1 font-bold text-gray-800">Produtos</h1>
-                        <p className="text-sm text-gray-500">
+                        <h1 className="text-x1 font-bold text-gray-800 dark:text-gray-100">Produtos</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                             {produtos.length}{'  '}{produtos.length === 1 ? 'produto cadastrado' : 'produtos cadastrados'}
                         </p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <button onClick={carregarProdutos} title="Recarregar Lista" className="p-2.5 text-gray-500 hover:bg-gray-700 hover:text-gray-200 rounded-lg transition-colors">
+                    <button onClick={carregarProdutos} title="Recarregar Lista" className="p-2.5 text-gray-500 dark:text-gray-400 hover:bg-gray-700 hover:text-gray-200 rounded-lg transition-colors">
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}/> 
                     </button>
                     <button onClick={handleNovo} className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm">
@@ -128,7 +128,7 @@ function ProdutosPage() {
              {loading ? (
                 <div className="flex items-center justify-center py-20">
                     <RefreshCw className="w-6 h-6 text-blue-500 animate-spin" />
-                    <span className="ml-3 text-gray-500">Carregando Produtos...</span>
+                    <span className="ml-3 text-gray-500 dark:text-gray-400">Carregando Produtos...</span>
                 </div>
              ) : (
                 <ProdutoTable

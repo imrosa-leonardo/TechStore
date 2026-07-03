@@ -64,7 +64,7 @@ function ProdutoFormModal({ isOpen, onClose, produtoEditando, onSalvar, categori
                         type="text"
                         value={nome}
                         onChange={(e) => setNome(e.target.value)}
-                        placeholder="Ex: Camiseta"
+                        placeholder="Ex: Nome do jogo"
                         required
                         className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
                     />
@@ -77,7 +77,7 @@ function ProdutoFormModal({ isOpen, onClose, produtoEditando, onSalvar, categori
                         type="text"
                         value={descricao}
                         onChange={(e) => setDescricao(e.target.value)}
-                        placeholder="Ex: Camiseta 100% algodão, disponível em várias cores."
+                        placeholder="Ex: PlayStation 5, ou Monitor OLED."
                         className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
                     />
                 </div>
@@ -132,7 +132,7 @@ function ProdutoFormModal({ isOpen, onClose, produtoEditando, onSalvar, categori
                         min="0"
                         value={preco}
                         onChange={(e) => setPreco(e.target.value)}
-                        placeholder="Ex: 49.90"
+                        placeholder="Ex: 99.99"
                         required
                         className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
                     />

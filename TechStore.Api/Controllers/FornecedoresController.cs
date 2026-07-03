@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TechStore.Api.Data;
 using TechStore.Api.Models;
 
@@ -7,6 +9,7 @@ namespace TechStore.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class FornecedoresController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -16,11 +19,16 @@ public class FornecedoresController : ControllerBase
         _context = context;
     }
 
+    private int UsuarioIdAtual =>
+        int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
     // GET: api/fornecedores
     [HttpGet]
     public async Task<IActionResult> Listar()
     {
-        var fornecedores = await _context.Fornecedores.ToListAsync();
+        var fornecedores = await _context.Fornecedores
+            .Where(f => f.UsuarioId == UsuarioIdAtual)
+            .ToListAsync();
         return Ok(fornecedores);
     }
 
@@ -30,6 +38,7 @@ public class FornecedoresController : ControllerBase
     {
         if (fornecedor == null) return BadRequest();
 
+        fornecedor.UsuarioId = UsuarioIdAtual;
         _context.Fornecedores.Add(fornecedor);
         await _context.SaveChangesAsync();
 
@@ -42,7 +51,9 @@ public class FornecedoresController : ControllerBase
     {
         if (id != fornecedorAlterado.Id) return BadRequest("ID incompatível.");
 
-        var fornecedor = await _context.Fornecedores.FindAsync(id);
+        var fornecedor = await _context.Fornecedores
+            .FirstOrDefaultAsync(f => f.Id == id && f.UsuarioId == UsuarioIdAtual);
+
         if (fornecedor == null) return NotFound("Fornecedor não encontrado.");
 
         fornecedor.Nome = fornecedorAlterado.Nome;
@@ -56,7 +67,9 @@ public class FornecedoresController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Deletar(int id)
     {
-        var fornecedor = await _context.Fornecedores.FindAsync(id);
+        var fornecedor = await _context.Fornecedores
+            .FirstOrDefaultAsync(f => f.Id == id && f.UsuarioId == UsuarioIdAtual);
+
         if (fornecedor == null) return NotFound("Fornecedor não encontrado.");
 
         try
@@ -67,7 +80,6 @@ public class FornecedoresController : ControllerBase
         }
         catch (DbUpdateException)
         {
-            // Tratamento devido ao DeleteBehavior.Restrict configurado anteriormente
             return BadRequest("Não é possível remover um fornecedor que possui produtos vinculados.");
         }
     }

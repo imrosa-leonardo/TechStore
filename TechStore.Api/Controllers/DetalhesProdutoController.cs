@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TechStore.Api.Data;
 using TechStore.Api.Models;
 
@@ -7,20 +9,25 @@ namespace TechStore.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class DetalhesProdutoController : ControllerBase
 {
     private readonly AppDbContext _context;
+
     public DetalhesProdutoController(AppDbContext context)
     {
         _context = context;
     }
 
+    private int UsuarioIdAtual =>
+        int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
     [HttpGet("produto/{produtoId}")]
-    public async Task<ActionResult<DetalheProduto>> GetDetalhePorProduto (int produtoId)
+    public async Task<ActionResult<DetalheProduto>> GetDetalhePorProduto(int produtoId)
     {
         var detalhe = await _context.DetalhesProduto
             .Include(d => d.Produto)
-            .FirstOrDefaultAsync(d => d.ProdutoId == produtoId);
+            .FirstOrDefaultAsync(d => d.ProdutoId == produtoId && d.Produto!.UsuarioId == UsuarioIdAtual);
 
         if (detalhe == null)
         {
@@ -33,7 +40,9 @@ public class DetalhesProdutoController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<DetalheProduto>> PostDetalhe(DetalheProduto detalhe)
     {
-        var produto = await _context.Produtos.FindAsync(detalhe.ProdutoId);
+        var produto = await _context.Produtos
+            .FirstOrDefaultAsync(p => p.Id == detalhe.ProdutoId && p.UsuarioId == UsuarioIdAtual);
+
         if (produto == null)
         {
             return BadRequest(new { mensagem = $"Produto com ID {detalhe.ProdutoId} não encontrado." });
@@ -61,7 +70,9 @@ public class DetalhesProdutoController : ControllerBase
             return BadRequest(new { mensagem = "O ID da URL não corresponde ao ID do detalhe" });
         }
 
-        var detalheExistente = await _context.DetalhesProduto.FindAsync(id);
+        var detalheExistente = await _context.DetalhesProduto
+            .Include(d => d.Produto)
+            .FirstOrDefaultAsync(d => d.Id == id && d.Produto!.UsuarioId == UsuarioIdAtual);
 
         if (detalheExistente == null)
         {
@@ -76,15 +87,17 @@ public class DetalhesProdutoController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
-    
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteDetalhe(int id)
     {
-        var detalhe = await _context.DetalhesProduto.FindAsync(id);
-        
+        var detalhe = await _context.DetalhesProduto
+            .Include(d => d.Produto)
+            .FirstOrDefaultAsync(d => d.Id == id && d.Produto!.UsuarioId == UsuarioIdAtual);
+
         if (detalhe == null)
         {
-            return NotFound(new { mensagem = $"Detalhe com ID {id} não encontrado."});
+            return NotFound(new { mensagem = $"Detalhe com ID {id} não encontrado." });
         }
 
         _context.DetalhesProduto.Remove(detalhe);

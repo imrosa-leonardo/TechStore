@@ -1,33 +1,26 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5243/api/categorias';
-
-const api = axios.create({
-    baseURL: API_URL,
-    headers: { 'Content-Type': 'application/json' },
-});
+import api from './api';
 
 export const getCategorias = async () => {
-    const response = await api.get('/');
+    const response = await api.get('/categorias');
     return response.data;
 };
 
 export const getCategoria = async (id) => {
-    const response = await api.get(`/${id}`);
+    const response = await api.get(`/categorias/${id}`);
     return response.data;
 };
 
 export const criarCategoria = async (categoria) => {
-    const response = await api.post('/', categoria);
+    const response = await api.post('/categorias', categoria);
     return response.data;
 };
 
 export const atualizarCategoria = async (id, categoria) => {
-    const response = await api.put(`/${id}`, categoria);
+    const response = await api.put(`/categorias/${id}`, categoria);
     return response.data;
 };
 
 export const deletarCategoria = async (id) => {
-    const response = await api.delete(`/${id}`);
+    const response = await api.delete(`/categorias/${id}`);
     return response.data;
 };

@@ -7,6 +7,9 @@ public class Categoria
 
     public string? Descricao { get; set; }
 
+    public int UsuarioId { get; set; }
+    public Usuario? Usuario { get; set; }
+
     public ICollection<Produto> Produtos { get; set; } = new List<Produto>();   
 
 }

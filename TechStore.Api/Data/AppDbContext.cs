@@ -42,5 +42,23 @@ public class AppDbContext : DbContext
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Isolamento de dados por usuário
+        modelBuilder.Entity<Produto>()
+            .HasOne(p => p.Usuario)
+            .WithMany()
+            .HasForeignKey(p => p.UsuarioId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Categoria>()
+            .HasOne(c => c.Usuario)
+            .WithMany()
+            .HasForeignKey(c => c.UsuarioId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Fornecedor>()
+            .HasOne(f => f.Usuario)
+            .WithMany()
+            .HasForeignKey(f => f.UsuarioId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

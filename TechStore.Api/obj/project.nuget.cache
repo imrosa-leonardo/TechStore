@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "5qtU9tfF17E=",
+  "dgSpecHash": "Vit64aV3hCo=",
   "success": true,
-  "projectFilePath": "D:\\Facul\\backup\\TechStore\\TechStore\\TechStore.Api\\TechStore.Api.csproj",
+  "projectFilePath": "D:\\Facul\\backup - Copy\\TechStore\\TechStore\\TechStore.Api\\TechStore.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\leozi\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\leozi\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",

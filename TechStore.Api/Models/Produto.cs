@@ -27,4 +27,7 @@ public class Produto
     public int? FornecedorId { get; set; }
     public Fornecedor? Fornecedor { get; set; }
 
+    public int UsuarioId { get; set; }
+    public Usuario? Usuario { get; set; }
+
 }

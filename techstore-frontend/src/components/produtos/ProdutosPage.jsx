@@ -11,7 +11,7 @@ import ProdutoTable from './ProdutoTable';
 import ProdutoFormModal from './ProdutoFormModal';
 import ProdutoDeleteDialog from './ProdutoDeleteDialog';
 import { getCategorias } from '../../services/categoriaService';
-import { fornecedorService } from '../../services/fornecedorService';
+import { notaFiscalService } from '../../services/notaFiscalService';
 
 function ProdutosPage() {
     const [produtos, setProdutos] = useState([]);
@@ -23,7 +23,7 @@ function ProdutosPage() {
     const [produtoEditando, setProdutoEditando] = useState(null);
     const [produtoDeletando, setProdutoDeletando] = useState(null);
     const [categorias, setCategorias] = useState([]);
-    const [fornecedores, setFornecedores] = useState([]);
+    const [notasFiscais, setNotasFiscais] = useState([]);
 
     const toast = useToast();
 
@@ -34,14 +34,14 @@ function ProdutosPage() {
     const carregarProdutos = async () => {
     try {
         setLoading(true);
-        const [dadosProdutos, dadosCategorias, dadosFornecedores] = await Promise.all([
+        const [dadosProdutos, dadosCategorias, dadosNotasFiscais] = await Promise.all([
             getProdutos(),
             getCategorias().catch(() => []),
-            fornecedorService.listar().catch(() => []),
+            notaFiscalService.listar().catch(() => []),
         ]);
-        setProdutos(dadosProdutos);
-        setCategorias(dadosCategorias);
-        setFornecedores(dadosFornecedores);
+            setProdutos(dadosProdutos);
+            setCategorias(dadosCategorias);
+            setNotasFiscais(dadosNotasFiscais);
     } catch (error) {
         toast.error('Erro ao carregar produtos');
         console.error('Erro: ', error);
@@ -151,7 +151,7 @@ function ProdutosPage() {
                 produtoEditando={produtoEditando}
                 onSalvar={handleSalvar}
                 categorias={categorias}
-                fornecedores={fornecedores}
+                notasFiscais={notasFiscais}
              />
 
              {/* Dialog de Confirmacao para Deletar */}

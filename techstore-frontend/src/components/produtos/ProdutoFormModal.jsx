@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FilePlus2 } from 'lucide-react';
 import Modal from '../ui/Modal';
 
-function ProdutoFormModal({ isOpen, onClose, produtoEditando, onSalvar, categorias, fornecedores}) {
+function ProdutoFormModal({ isOpen, onClose, produtoEditando, onSalvar, categorias, notasFiscais }) {
     const [nome, setNome] = useState('');
     const [descricao, setDescricao] = useState('');
     const [preco, setPreco] = useState('');
     const [quantidade, setQuantidade] = useState('');
     const [categoriaId, setCategoriaId] = useState('');
-    const [fornecedorId, setFornecedorId] = useState('');
+    const [notaFiscalId, setNotaFiscalId] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (isOpen) {
@@ -17,23 +20,28 @@ function ProdutoFormModal({ isOpen, onClose, produtoEditando, onSalvar, categori
                 setPreco(produtoEditando.preco?.toString() || '');
                 setQuantidade(produtoEditando.quantidade?.toString() || '');
                 setCategoriaId(produtoEditando.categoriaId?.toString() || '');
-                setFornecedorId(produtoEditando.fornecedorId?.toString() || '');
+                setNotaFiscalId(produtoEditando.notaFiscalId?.toString() || '');
             } else {
                 setNome('');
                 setDescricao('');
                 setPreco('');
                 setQuantidade('');
                 setCategoriaId('');
-                setFornecedorId('');
+                setNotaFiscalId('');
             }
         }
     }, [isOpen, produtoEditando]);
-    
+
+    const handleIrParaNotaFiscal = () => {
+        onClose();
+        navigate('/notas-fiscais');
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
         const produto = {
-            nome, 
+            nome,
             descricao,
             preco: parseFloat(preco),
             quantidade: parseInt(quantidade),
@@ -43,8 +51,8 @@ function ProdutoFormModal({ isOpen, onClose, produtoEditando, onSalvar, categori
             produto.categoriaId = parseInt(categoriaId);
         }
 
-        if (fornecedorId) {
-            produto.fornecedorId = parseInt(fornecedorId);
+        if (notaFiscalId) {
+            produto.notaFiscalId = parseInt(notaFiscalId);
         }
 
         if (produtoEditando) {
@@ -102,26 +110,6 @@ function ProdutoFormModal({ isOpen, onClose, produtoEditando, onSalvar, categori
                     </div>
                 )}
 
-                {fornecedores && fornecedores.length > 0 && (
-                    <div>
-                        <label htmlFor="fornecedor" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Fornecedor <span className="text-gray-400 dark:text-gray-500 font-normal">(opcional)</span>
-                        </label>
-                        <select
-                            id="fornecedor"
-                            value={fornecedorId}
-                            onChange={(e) => setFornecedorId(e.target.value)}
-                            className="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow bg-white dark:bg-gray-900 dark:text-gray-100"
-                        >
-                            <option value="">-- Selecione um fornecedor --</option>
-                            {fornecedores.map((fornecedor) => (
-                                <option key={fornecedor.id} value={fornecedor.id}>
-                                    {fornecedor.nome}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                )}
 
                 <div>
                     <label htmlFor="preco" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Preço (R$)</label>
@@ -152,7 +140,6 @@ function ProdutoFormModal({ isOpen, onClose, produtoEditando, onSalvar, categori
                     />
                 </div>
 
-                {/* Ações */}
                 <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors">
                         Cancelar
@@ -165,6 +152,5 @@ function ProdutoFormModal({ isOpen, onClose, produtoEditando, onSalvar, categori
         </Modal>
     );
 }
-
 
 export default ProdutoFormModal;

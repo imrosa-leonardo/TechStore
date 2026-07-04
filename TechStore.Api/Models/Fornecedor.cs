@@ -9,6 +9,5 @@ public class Fornecedor
     public int UsuarioId { get; set; }
     public Usuario? Usuario { get; set; }
 
-    // Relacionamento: Um Fornecedor pode ter muitos Produtos
-    public ICollection<Produto> Produtos { get; set; } = new List<Produto>();
+    public ICollection<NotaFiscal> NotasFiscais { get; set; } = new List<NotaFiscal>();
 }

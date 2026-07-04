@@ -28,7 +28,6 @@ public class ProdutosController : ControllerBase
     {
         var produtos = await _context.Produtos
             .Include(p => p.Categoria)
-            .Include(p => p.Fornecedor)
             .Where(p => p.UsuarioId == UsuarioIdAtual)
             .ToListAsync();
         return Ok(produtos);
@@ -81,7 +80,6 @@ public class ProdutosController : ControllerBase
         produtoExistente.Preco = produto.Preco;
         produtoExistente.Quantidade = produto.Quantidade;
         produtoExistente.CategoriaId = produto.CategoriaId;
-        produtoExistente.FornecedorId = produto.FornecedorId;
 
         await _context.SaveChangesAsync();
 

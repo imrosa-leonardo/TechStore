@@ -41,6 +41,7 @@ function ProdutoTable({ produtos, searchTerm, onSearchChange, onEditar, onDeleta
                             <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-6 py-3">Nome</th>
                             <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-6 py-3">Descrição</th>
                             <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-6 py-3">Categoria</th>
+                            <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-6 py-3">Nota Fiscal</th>
                             <th className="text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-6 py-3">Preço</th>
                             <th className="text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-6 py-3">Estoque</th>
                             <th className="text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-6 py-3">Ações</th>
@@ -65,6 +66,8 @@ function ProdutoTable({ produtos, searchTerm, onSearchChange, onEditar, onDeleta
                                         <span className="text-sm text-gray-500 dark:text-gray-400">Sem Categoria</span>
                                     )}
                                 </td>
+
+                                
                                 
                                 <td className="px-6 py-4 text-right">
                                     <span className="text-sm font-medium text-gray-900 dark:text-gray-100"> R$ {produto.preco.toFixed(2)} </span>

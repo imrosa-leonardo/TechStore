@@ -6,6 +6,7 @@ import LoginPage from './components/auth/LoginPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import RegisterPage from './components/auth/RegisterPage';
 import FornecedoresPage from './components/fornecedores/FornecedoresPage';
+import NotasFiscaisPage from './components/notasFiscais/NotasFiscaisPage';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/produtos" element={<ProdutosPage />} />
         <Route path="/categorias" element={<CategoriasPage />} />
         <Route path="/fornecedores" element={<FornecedoresPage /> } />
+        <Route path="/notas-fiscais" element={<NotasFiscaisPage />} />
       </Route>
     </Routes>
   );

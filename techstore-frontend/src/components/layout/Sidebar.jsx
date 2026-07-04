@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Truck, ShoppingCart, Tag, Monitor, LogOut, Sun, Moon } from 'lucide-react';
+import { Truck, ShoppingCart, Tag, Monitor, LogOut, Sun, Moon, FileText } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -7,6 +7,7 @@ const menuItems = [
   { to: '/produtos', label: 'Produtos', icon: ShoppingCart, enabled: true },
   { to: '/categorias', label: 'Categorias', icon: Tag, enabled: true },
   { to: '/fornecedores', label: 'Fornecedores', icon: Truck, enabled: true },
+  { to: '/notas-fiscais', label: 'Nota Fiscal', icon: FileText, enabled: true },
 ];
 
 function Sidebar() {

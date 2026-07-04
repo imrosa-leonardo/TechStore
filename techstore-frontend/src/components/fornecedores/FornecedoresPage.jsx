@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, RefreshCw, Truck } from 'lucide-react';
 import { fornecedorService } from '../../services/fornecedorService';
+import { notaFiscalService } from '../../services/notaFiscalService';
 import { useToast } from '../../hooks/useToast';
 import FornecedoresTable from './FornecedoresTable';
 import FornecedorFormModal from './FornecedorFormModal';
@@ -8,6 +9,7 @@ import ConfirmDialog from '../ui/ConfirmDialog';
 
 function FornecedoresPage() {
     const [fornecedores, setFornecedores] = useState([]);
+    const [notasFiscais, setNotasFiscais] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
 
@@ -19,20 +21,28 @@ function FornecedoresPage() {
     const toast = useToast();
 
     useEffect(() => {
-        carregarFornecedores();
+        carregarDados();
     }, []);
 
-    const carregarFornecedores = async () => {
+    const carregarDados = async () => {
         try {
             setLoading(true);
-            const dados = await fornecedorService.listar();
-            setFornecedores(dados);
+            const [dadosFornecedores, dadosNotasFiscais] = await Promise.all([
+                fornecedorService.listar(),
+                notaFiscalService.listar().catch(() => []),
+            ]);
+            setFornecedores(dadosFornecedores);
+            setNotasFiscais(dadosNotasFiscais);
         } catch (error) {
             toast.error('Não foi possível carregar os fornecedores. Verifique se a API está rodando.');
             console.error('Erro ao carregar fornecedores:', error);
         } finally {
             setLoading(false);
         }
+    };
+
+    const notasFiscaisPorFornecedor = (fornecedorId) => {
+        return notasFiscais.filter((n) => n.fornecedorId === fornecedorId).length;
     };
 
     const handleNovo = () => {
@@ -47,13 +57,13 @@ function FornecedoresPage() {
 
     const handleSucessoFormulario = async () => {
         setIsFormModalOpen(false);
-        setFornecedorEditando(null);
         toast.success(
             fornecedorEditando
                 ? `Fornecedor "${fornecedorEditando.nome}" atualizado com sucesso!`
                 : 'Fornecedor cadastrado com sucesso!'
         );
-        await carregarFornecedores();
+        setFornecedorEditando(null);
+        await carregarDados();
     };
 
     const handleConfirmarDeletar = (fornecedor) => {
@@ -67,9 +77,9 @@ function FornecedoresPage() {
             toast.success(`Fornecedor "${fornecedorDeletando.nome}" removido com sucesso!`);
             setIsDeleteDialogOpen(false);
             setFornecedorDeletando(null);
-            await carregarFornecedores();
+            await carregarDados();
         } catch (error) {
-            const mensagemErro = error.response?.data || 'Erro ao remover fornecedor. Verifique se ele possui produtos vinculados.';
+            const mensagemErro = error.response?.data || 'Erro ao remover fornecedor. Verifique se ele possui notas fiscais vinculadas.';
             toast.error(mensagemErro);
             setIsDeleteDialogOpen(false);
             console.error('Erro ao deletar fornecedor:', error);
@@ -95,7 +105,7 @@ function FornecedoresPage() {
 
                 <div className="flex items-center gap-2">
                     <button
-                        onClick={carregarFornecedores}
+                        onClick={carregarDados}
                         title="Recarregar lista"
                         className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
                     >
@@ -124,6 +134,7 @@ function FornecedoresPage() {
                     onSearchChange={setSearchTerm}
                     onEditar={handleEditar}
                     onDeletar={handleConfirmarDeletar}
+                    notasFiscaisPorFornecedor={notasFiscaisPorFornecedor}
                 />
             )}
 
@@ -149,7 +160,7 @@ function FornecedoresPage() {
                 title="Deletar Fornecedor"
                 message={
                     fornecedorDeletando
-                        ? `Tem certeza que deseja excluir o fornecedor "${fornecedorDeletando.nome}"? Fornecedores com produtos associados não podem ser deletados.`
+                        ? `Tem certeza que deseja excluir o fornecedor "${fornecedorDeletando.nome}"? Fornecedores com notas fiscais associadas não podem ser deletados.`
                         : ''
                 }
             />

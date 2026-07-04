@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TechStore.Api.Data;
@@ -11,9 +12,11 @@ using TechStore.Api.Data;
 namespace TechStore.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260704141732_SubstituiRelacaoDiretaPorItensNotaFiscal")]
+    partial class SubstituiRelacaoDiretaPorItensNotaFiscal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -156,6 +159,9 @@ namespace TechStore.Api.Migrations
 
                     b.Property<int>("UsuarioId")
                         .HasColumnType("integer");
+
+                    b.Property<decimal?>("ValorTotal")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 

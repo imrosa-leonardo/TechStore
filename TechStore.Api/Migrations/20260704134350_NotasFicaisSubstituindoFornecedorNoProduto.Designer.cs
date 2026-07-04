@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TechStore.Api.Data;
@@ -11,9 +12,11 @@ using TechStore.Api.Data;
 namespace TechStore.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260704134350_NotasFicaisSubstituindoFornecedorNoProduto")]
+    partial class NotasFicaisSubstituindoFornecedorNoProduto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,35 +107,6 @@ namespace TechStore.Api.Migrations
                     b.ToTable("Fornecedores");
                 });
 
-            modelBuilder.Entity("TechStore.Api.Models.ItemNotaFiscal", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("NotaFiscalId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ProdutoId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Quantidade")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("ValorUnitario")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NotaFiscalId");
-
-                    b.HasIndex("ProdutoId");
-
-                    b.ToTable("ItensNotaFiscal");
-                });
-
             modelBuilder.Entity("TechStore.Api.Models.NotaFiscal", b =>
                 {
                     b.Property<int>("Id")
@@ -156,6 +130,9 @@ namespace TechStore.Api.Migrations
 
                     b.Property<int>("UsuarioId")
                         .HasColumnType("integer");
+
+                    b.Property<decimal?>("ValorTotal")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -187,6 +164,9 @@ namespace TechStore.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("NotaFiscalId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("Preco")
                         .HasColumnType("numeric");
 
@@ -199,6 +179,8 @@ namespace TechStore.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoriaId");
+
+                    b.HasIndex("NotaFiscalId");
 
                     b.HasIndex("UsuarioId");
 
@@ -259,25 +241,6 @@ namespace TechStore.Api.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("TechStore.Api.Models.ItemNotaFiscal", b =>
-                {
-                    b.HasOne("TechStore.Api.Models.NotaFiscal", "NotaFiscal")
-                        .WithMany("Itens")
-                        .HasForeignKey("NotaFiscalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TechStore.Api.Models.Produto", "Produto")
-                        .WithMany("ItensNotaFiscal")
-                        .HasForeignKey("ProdutoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("NotaFiscal");
-
-                    b.Navigation("Produto");
-                });
-
             modelBuilder.Entity("TechStore.Api.Models.NotaFiscal", b =>
                 {
                     b.HasOne("TechStore.Api.Models.Fornecedor", "Fornecedor")
@@ -305,6 +268,11 @@ namespace TechStore.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("TechStore.Api.Models.NotaFiscal", "NotaFiscal")
+                        .WithMany("Produtos")
+                        .HasForeignKey("NotaFiscalId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("TechStore.Api.Models.Usuario", "Usuario")
                         .WithMany()
                         .HasForeignKey("UsuarioId")
@@ -312,6 +280,8 @@ namespace TechStore.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Categoria");
+
+                    b.Navigation("NotaFiscal");
 
                     b.Navigation("Usuario");
                 });
@@ -328,14 +298,12 @@ namespace TechStore.Api.Migrations
 
             modelBuilder.Entity("TechStore.Api.Models.NotaFiscal", b =>
                 {
-                    b.Navigation("Itens");
+                    b.Navigation("Produtos");
                 });
 
             modelBuilder.Entity("TechStore.Api.Models.Produto", b =>
                 {
                     b.Navigation("DetalheProduto");
-
-                    b.Navigation("ItensNotaFiscal");
                 });
 #pragma warning restore 612, 618
         }

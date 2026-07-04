@@ -1,6 +1,6 @@
 import { Search, Pencil, Trash2, Truck } from 'lucide-react';
 
-function FornecedoresTable({ fornecedores, searchTerm, onSearchChange, onEditar, onDeletar }) {
+function FornecedoresTable({ fornecedores, searchTerm, onSearchChange, onEditar, onDeletar, notasFiscaisPorFornecedor }) {
     const fornecedoresFiltrados = fornecedores.filter((f) => {
         const termo = searchTerm.toLowerCase();
         return (
@@ -38,6 +38,7 @@ function FornecedoresTable({ fornecedores, searchTerm, onSearchChange, onEditar,
                         <tr className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
                             <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-6 py-3">Nome</th>
                             <th className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-6 py-3">Contato</th>
+                            <th className="text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-6 py-3">Notas Fiscais</th>
                             <th className="text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-6 py-3">Ações</th>
                         </tr>
                     </thead>
@@ -57,6 +58,12 @@ function FornecedoresTable({ fornecedores, searchTerm, onSearchChange, onEditar,
 
                                 <td className="px-6 py-4">
                                     <span className="text-sm text-gray-500 dark:text-gray-400">{fornecedor.contato || '-'}</span>
+                                </td>
+
+                                <td className="px-6 py-4 text-center">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300">
+                                        {notasFiscaisPorFornecedor ? notasFiscaisPorFornecedor(fornecedor.id) : 0} notas
+                                    </span>
                                 </td>
 
                                 <td className="px-6 py-4">

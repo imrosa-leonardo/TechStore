@@ -27,10 +27,11 @@ Sistema de gerenciamento de estoque com cadastro de produtos, categorias, fornec
 - **Isolamento por usuário**: cada conta enxerga e manipula apenas seus próprios produtos, categorias, fornecedores e notas fiscais
 - **Modo claro/escuro**: alternância de tema persistida entre sessões, disponível em todas as telas (incluindo login e cadastro)
 - **Produtos**: cadastro, edição, exclusão e listagem, com busca por nome/descrição
+- **Visualização completa do produto**: ao clicar no nome de um produto na tabela, abre uma tela somente-leitura com todas as informações consolidadas — categoria, preço, estoque, data de cadastro e detalhes técnicos
+- **Detalhes técnicos do produto**: especificações, garantia, país de origem e peso, cadastrados separadamente da edição básica do produto
 - **Categorias**: cadastro, edição e exclusão, vinculadas aos produtos
 - **Fornecedores**: cadastro, edição e exclusão, vinculados às notas fiscais
 - **Notas Fiscais**: cadastro de notas por fornecedor, com itens (produtos, quantidade e valor unitário) e valor total calculado automaticamente a partir dos itens
-- **Detalhe do Produto**: informações complementares de cada produto (relação um-para-um)
 - **Notificações (Toast)**: feedback visual de sucesso/erro nas operações
 
 ## Modelo de dados
@@ -62,7 +63,7 @@ Representa a classificação de um produto (ex: Jogos, Monitores). Pertence a um
 
 ### Fornecedor
 
-Representa o parceiro ou distribuidor responsável por emitir notas fiscais. Pertence a um único usuário e não pode ser excluído enquanto houver notas fiscais associadas. Não possui mais vínculo direto com Produto — a ligação passa a existir através das notas fiscais.
+Representa o parceiro ou distribuidor responsável por emitir notas fiscais. Pertence a um único usuário e não pode ser excluído enquanto houver notas fiscais associadas. Não possui vínculo direto com Produto — a ligação existe através das notas fiscais.
 
 - `Id` (chave primária)
 - `Nome`
@@ -126,7 +127,7 @@ Entidade central do sistema. Pertence a um único usuário, uma categoria, possu
 
 ### DetalheProduto
 
-Armazena informações complementares de um produto específico. Não possui vínculo direto com Usuario — sua proteção é feita indiretamente, através do produto ao qual pertence. Cada produto possui no máximo um detalhe, e a exclusão do produto remove automaticamente seu detalhe associado.
+Armazena informações complementares de um produto específico — especificações técnicas, garantia, país de origem e peso. Não possui vínculo direto com Usuario; sua proteção é feita indiretamente, através do produto ao qual pertence. Cada produto possui no máximo um detalhe, cadastrado separadamente da edição básica do produto, e a exclusão do produto remove automaticamente seu detalhe associado.
 
 - `Id` (chave primária)
 - `Especificacoes`
@@ -177,7 +178,8 @@ TechStore/
     └── src/
         ├── components/
         │   ├── auth/               # LoginPage, RegisterPage, ProtectedRoute
-        │   ├── produtos/           # Página, tabela, modais de produto
+        │   ├── produtos/           # Página, tabela, modais de produto,
+        │   │                       # visualização completa e detalhes técnicos
         │   ├── categorias/         # Página, tabela, modal de categoria
         │   ├── fornecedores/       # Página, tabela e modal de fornecedor
         │   ├── notasFiscais/       # Página, tabela, modal de nota fiscal e de itens
@@ -194,7 +196,8 @@ TechStore/
         │   ├── categoriaService.js
         │   ├── fornecedorService.js
         │   ├── notaFiscalService.js
-        │   └── itemNotaFiscalService.js
+        │   ├── itemNotaFiscalService.js
+        │   └── detalheProdutoService.js
         ├── App.jsx
         └── main.jsx
 ```
@@ -275,6 +278,13 @@ Ao cadastrar uma nota fiscal, apenas número, série, fornecedor e data de emiss
 - Selecionar um produto preenche automaticamente a quantidade em estoque e o preço cadastrado como sugestão inicial (podendo ser ajustados)
 - Cada item guarda a quantidade e o valor unitário daquela compra específica, independente do valor atual do produto
 - O valor total da nota é somado automaticamente a partir dos itens, sem necessidade de digitação manual
+
+## Visualização e detalhes do Produto
+
+Além do formulário básico de cadastro/edição, cada produto conta com duas telas adicionais:
+
+- **Visualização completa** (somente leitura): acessada ao clicar no nome do produto na tabela, reúne nome, descrição, categoria, preço, estoque, data de cadastro e os detalhes técnicos, caso existam
+- **Detalhes técnicos**: um cadastro complementar e opcional (especificações, garantia, país de origem, peso), mantido separado dos dados básicos do produto para não sobrecarregar o formulário principal
 
 ## Modo claro/escuro
 

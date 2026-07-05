@@ -12,6 +12,8 @@ import ProdutoFormModal from './ProdutoFormModal';
 import ProdutoDeleteDialog from './ProdutoDeleteDialog';
 import { getCategorias } from '../../services/categoriaService';
 import { notaFiscalService } from '../../services/notaFiscalService';
+import DetalheProdutoModal from './DetalheProdutoModal';
+import ProdutoViewModal from './ProdutoViewModal';
 
 function ProdutosPage() {
     const [produtos, setProdutos] = useState([]);
@@ -24,6 +26,11 @@ function ProdutosPage() {
     const [produtoDeletando, setProdutoDeletando] = useState(null);
     const [categorias, setCategorias] = useState([]);
     const [notasFiscais, setNotasFiscais] = useState([]);
+    const [isDetalheModalOpen, setIsDetalheModalOpen] = useState(false);
+    const [produtoDetalhe, setProdutoDetalhe] = useState(null);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [produtoVisualizandoId, setProdutoVisualizandoId] = useState(null);
+
 
     const toast = useToast();
 
@@ -96,6 +103,16 @@ function ProdutosPage() {
             }
         };
 
+        const handleVerDetalhe = (produto) => {
+            setProdutoDetalhe(produto);
+            setIsDetalheModalOpen(true);
+        };
+
+        const handleVisualizar = (produto) => {
+            setProdutoVisualizandoId(produto.id);
+            setIsViewModalOpen(true);
+        };
+
         return (
         <div className="p-6">
             {/* Header */}
@@ -136,13 +153,15 @@ function ProdutosPage() {
                     searchTerm={searchTerm}
                     onSearchChange={setSearchTerm}
                     onEditar={handleEditar}
+                    onVerDetalhe={handleVerDetalhe}
                     onDeletar={handleConfirmarDelete}
+                    onVisualizar={handleVisualizar}
                 />
              )}
 
              {/* Modal de Formulario (criar/editar) */}
 
-             <ProdutoFormModal
+            <ProdutoFormModal
                 isOpen={isFormModalOpen}
                 onClose={() => {
                     setIsFormModalOpen(false);
@@ -152,11 +171,21 @@ function ProdutosPage() {
                 onSalvar={handleSalvar}
                 categorias={categorias}
                 notasFiscais={notasFiscais}
-             />
+                />
+
+            {/* Modal de Formulario (Detalhes do Produto) */ }
+            <DetalheProdutoModal
+                isOpen={isDetalheModalOpen}
+                onClose={() => {
+                    setIsDetalheModalOpen(false);
+                    setProdutoDetalhe(null);
+                }}
+                produto={produtoDetalhe}
+                />
 
              {/* Dialog de Confirmacao para Deletar */}
 
-             <ProdutoDeleteDialog
+            <ProdutoDeleteDialog
                 isOpen={isDeleteDialogOpen}
                 onClose={() => {
                     setIsDeleteDialogOpen(false);
@@ -164,7 +193,17 @@ function ProdutosPage() {
                 }}
                 onConfirm={handleDeletar}
                 produto={produtoDeletando}
-             />
+                />
+
+            <ProdutoViewModal
+                isOpen={isViewModalOpen}
+                onClose={() => {
+                    setIsViewModalOpen(false);
+                    setProdutoVisualizandoId(null);
+                }}
+                produtoId={produtoVisualizandoId}
+/>
+
         </div>
     );                  
 }

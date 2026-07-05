@@ -1,6 +1,6 @@
-import { Search, Pencil, Trash2, PackageOpen } from 'lucide-react';
+import { Search, Pencil, Trash2, PackageOpen, Info } from 'lucide-react';
 
-function ProdutoTable({ produtos, searchTerm, onSearchChange, onEditar, onDeletar }) {
+function ProdutoTable({ produtos, searchTerm, onSearchChange, onEditar, onDeletar, onVerDetalhe, onVisualizar }) {
     const produtosFiltrados = produtos.filter((p) => {
         const termo = searchTerm.toLowerCase();
         return (
@@ -51,8 +51,12 @@ function ProdutoTable({ produtos, searchTerm, onSearchChange, onEditar, onDeleta
                         {produtosFiltrados.map((produto) => (
                             <tr key={produto.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                 <td className="px-6 py-4">
-                                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{produto.nome}</span>
-                                </td> 
+                                    <button
+                                        onClick={() => onVisualizar(produto)}
+                                        className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors text-left">
+                                        {produto.nome}
+                                    </button>
+                                </td>
                                 <td className="px-6 py-4">
                                     <span className="text-sm text-gray-500 dark:text-gray-400">{produto.descricao || '-'}</span>
                                 </td>
@@ -82,6 +86,9 @@ function ProdutoTable({ produtos, searchTerm, onSearchChange, onEditar, onDeleta
                                     <div className="flex items-center justify-center gap-2">
                                         <button onClick={() => onEditar(produto)} title="Editar Produto" className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors">
                                             <Pencil className="w-4 h-4" />
+                                        </button>
+                                        <button onClick={() => onVerDetalhe(produto)} title="Detalhes do Produto" className="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-lg transition-colors">
+                                            <Info className="w-4 h-4" />
                                         </button>
                                         <button onClick={() => onDeletar(produto)} title="Deletar Produto" className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">
                                             <Trash2 className="w-4 h-4" />

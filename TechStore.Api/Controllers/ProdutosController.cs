@@ -34,7 +34,6 @@ public class ProdutosController : ControllerBase
             .Where(p => p.UsuarioId == UsuarioIdAtual)
             .ToListAsync();
 
-        // 200 OK
         return Ok(produtos);
     }
 
@@ -46,16 +45,14 @@ public class ProdutosController : ControllerBase
     {
         var produto = await _context.Produtos
             .Include(p => p.Categoria)
-            .Include(p => p.DetalheProduto) // aqui SIM incluímos o detalhe técnico completo
+            .Include(p => p.DetalheProduto)
             .FirstOrDefaultAsync(p => p.Id == id && p.UsuarioId == UsuarioIdAtual);
 
         if (produto == null)
         {
-            // 404 Not Found — produto não existe ou pertence a outro usuário.
             return NotFound(new { mensagem = $"Produto com o ID {id} não encontrado." });
         }
 
-        // 200 OK
         return Ok(produto);
     }
 
@@ -63,17 +60,39 @@ public class ProdutosController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Produto>> PostProduto(Produto produto)
     {
-        // A data de criação é definida pelo SERVIDOR, nunca pelo frontend —
-        // evita que alguém envie uma data falsa/manipulada no cadastro.
+        // VALIDAÇÃO EXPLÍCITA: a modelagem do banco (AppDbContext) exige que todo
+        // Produto tenha uma CategoriaId válida (relação obrigatória, não opcional).
+        // Em vez de deixar o banco rejeitar isso silenciosamente com um erro 500
+        // de violação de chave estrangeira, checamos ANTES se a categoria realmente
+        // existe e pertence ao usuário logado — assim devolvemos uma mensagem clara.
+        var categoriaExiste = await _context.Categorias
+            .AnyAsync(c => c.Id == produto.CategoriaId && c.UsuarioId == UsuarioIdAtual);
+
+        if (!categoriaExiste)
+        {
+            // 400 Bad Request — impede a tentativa de salvar um produto "órfão"
+            // (sem categoria válida), que violaria a integridade do banco.
+            return BadRequest(new { mensagem = "Selecione uma categoria válida. Todo produto precisa estar vinculado a uma categoria existente." });
+        }
+
         produto.DataCriacao = DateTime.UtcNow;
         produto.UsuarioId = UsuarioIdAtual;
 
-        _context.Produtos.Add(produto);
-        await _context.SaveChangesAsync();
+        try
+        {
+            _context.Produtos.Add(produto);
+            await _context.SaveChangesAsync();
 
-        // CreatedAtAction retorna 201 Created, com um cabeçalho "Location" apontando
-        // para a URL de GetProduto(id) — permite ao cliente buscar o recurso recém-criado.
-        return CreatedAtAction(nameof(GetProduto), new { id = produto.Id }, produto);
+            return CreatedAtAction(nameof(GetProduto), new { id = produto.Id }, produto);
+        }
+        catch (DbUpdateException)
+        {
+            // Rede de segurança: mesmo com a validação acima, mantemos esse catch
+            // para cobrir qualquer outra violação de integridade inesperada no banco
+            // (ex: condição de corrida rara, onde a categoria foi excluída bem no
+            // instante entre a checagem acima e o SaveChangesAsync).
+            return BadRequest(new { mensagem = "Não foi possível cadastrar o produto. Verifique se a categoria informada ainda existe." });
+        }
     }
 
     // PUT: api/Produtos/{id}
@@ -91,22 +110,34 @@ public class ProdutosController : ControllerBase
 
         if (produtoExistente == null)
         {
-            // 404 Not Found
             return NotFound(new { mensagem = $"Produto com o ID {id} não encontrado." });
         }
 
-        // Atualização campo a campo — note que UsuarioId e DataCriacao NÃO são
-        // reatribuídos aqui, preservando o dono original e a data de cadastro real.
+        // Mesma validação aplicada na edição: impede trocar o produto para
+        // uma categoria inexistente ou de outro usuário.
+        var categoriaExiste = await _context.Categorias
+            .AnyAsync(c => c.Id == produto.CategoriaId && c.UsuarioId == UsuarioIdAtual);
+
+        if (!categoriaExiste)
+        {
+            return BadRequest(new { mensagem = "Selecione uma categoria válida. Todo produto precisa estar vinculado a uma categoria existente, caso contrário, crie uma categoria." });
+        }
+
         produtoExistente.Nome = produto.Nome;
         produtoExistente.Descricao = produto.Descricao;
         produtoExistente.Preco = produto.Preco;
         produtoExistente.Quantidade = produto.Quantidade;
         produtoExistente.CategoriaId = produto.CategoriaId;
 
-        await _context.SaveChangesAsync();
-
-        // 204 No Content — atualização bem-sucedida, sem corpo de resposta.
-        return NoContent();
+        try
+        {
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        catch (DbUpdateException)
+        {
+            return BadRequest(new { mensagem = "Não foi possível atualizar o produto. Verifique se a categoria informada ainda existe." });
+        }
     }
 
     // DELETE: api/Produtos/{id}
@@ -118,7 +149,6 @@ public class ProdutosController : ControllerBase
 
         if (produto == null)
         {
-            // 404 Not Found
             return NotFound(new { mensagem = $"Produto com o ID {id} não encontrado." });
         }
 

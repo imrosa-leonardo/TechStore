@@ -100,8 +100,8 @@ public class CategoriasController : ControllerBase
         {
             return BadRequest(new
             {
-                mensagem = "Não é possível excluir esta categoria porque existem produtos associados a ela." +
-                "Remova ou reatribua os produtos antes de excluir a categoria."
+                mensagem = "Não é possível excluir esta categoria porque existem produtos associados a ela. " +
+"Remova ou reatribua os produtos antes de excluir a categoria."
             });
         }
 
